@@ -35,6 +35,7 @@
 #include "TAxis.h"
 #include "TEfficiency.h"
 #include "TFile.h"
+#include "TF1.h"
 #include "TH1.h"
 #include "TH2.h"
 #include "TString.h"
@@ -61,6 +62,7 @@ private:
   edm::FileInPath puWeights_;
   edm::FileInPath egammaSFs_;
   edm::FileInPath   muonSFs_;
+  edm::FileInPath ewkCorrect_;
   edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
   edm::EDGetTokenT<bool> elHltToken;
   edm::EDGetTokenT<bool> muHltToken;
@@ -88,7 +90,7 @@ private:
   int numCands;
   int nevent, run, lumisec;
   int channel, lep, reg;
-  double triggerWeight, lumiWeight, pileupWeight, genWeight, leptonWeight;
+  double triggerWeight, lumiWeight, pileupWeight, genWeight, leptonWeight, ewkWeight;
   double totalWeight;
   int trigger;
 
@@ -193,7 +195,8 @@ private:
 
   edm::Service<TFileService> fs;
   TTree* outTree_;
-  TFile *f1, *f2, *f3;
+  TFile *f1, *f2, *f3, *f4;
+  TF1   *g1;
   TH1D  *h1;
   TH2F  *h2, *h3, *h4;
 
@@ -225,6 +228,9 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
 
   if( iConfig.existsAs<FileInPath>("puWeights") )
        puWeights_ = iConfig.getParameter<FileInPath>("puWeights") ;
+
+  if( iConfig.existsAs<FileInPath>("ewkCorrect") )
+       ewkCorrect_ = iConfig.getParameter<FileInPath>("ewkCorrect") ;
 
   elHltToken        = consumes<bool>(            InputTag("hltMatchingElectrons", "trigBit"   ));
   muHltToken        = consumes<bool>(            InputTag("hltMatchingMuons",     "trigBit"   ));
@@ -460,6 +466,7 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("pileupWeight"     ,&pileupWeight     ,"pileupWeight/D"    );
   outTree_->Branch("genWeight"        ,&genWeight        ,"genWeight/D"       );
   outTree_->Branch("leptonWeight"     ,&leptonWeight     ,"leptonWeight/D"    );
+  outTree_->Branch("ewkWeight"        ,&ewkWeight        ,"ewkWeight/D"       );
   outTree_->Branch("totalWeight"      ,&totalWeight      ,"totalWeight/D"     );
   outTree_->Branch("deltaRleplep"     ,&deltaRleplep     ,"deltaRleplep/D"    );
   outTree_->Branch("delPhilepmet"     ,&delPhilepmet     ,"delPhilepmet/D"    );
@@ -499,51 +506,54 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
    // save generator information
    if(isSignal_ && not iEvent.isRealData() && passed_analysis){ // event may not have the proper info if it hasn't passed
      Handle< reco::CandidateCollection > genZlep;
-     iEvent.getByToken(genleptonicZ_ ,      genZlep);
-     const reco::Candidate& Zlep = (*genZlep)[0];
-     const reco::Candidate* genGrav = Zlep.mother(0);
-     const reco::Candidate* lep1 = Zlep.daughter(0);
-     const reco::Candidate* lep2 = Zlep.daughter(1);
+     iEvent.getByToken(genleptonicZ_ ,   genZlep);
+     if( genZlep->size() ){
+         const reco::Candidate& Zlep = (*genZlep)[0];
+         const reco::Candidate* genGrav = Zlep.numberOfMothers()>0 ? Zlep.mother(0) : Zlep.clone();
+         const reco::Candidate* lep1 = Zlep.daughter(0);
+         const reco::Candidate* lep2 = Zlep.daughter(1);
+         genptZl          = Zlep.pt();
+         genetaZl         = Zlep.eta();
+         genphiZl         = Zlep.phi();
+         genmassZl        = Zlep.mass();
+
+         genptl1          = lep1->pt();
+         genetal1         = lep1->eta();
+         genphil1         = lep1->phi();
+         genmassl1        = lep1->mass();
+         
+         genptl2          = lep2->pt();
+         genetal2         = lep2->eta();
+         genphil2         = lep2->phi();
+         genmassl2        = lep2->mass();
+
+         genptG           = genGrav->pt();
+         genetaG          = genGrav->eta();
+         genphiG          = genGrav->phi();
+         genmassG         = genGrav->mass();
+     }
      Handle< reco::CandidateCollection > genZhad;
-     iEvent.getByToken(genhadronicZ_ ,      genZhad);
-     const reco::Candidate& Zhad = (*genZhad)[0];
-     const reco::Candidate* q1 = Zhad.daughter(0);
-     const reco::Candidate* q2 = Zhad.daughter(1);
+     iEvent.getByToken(genhadronicZ_ ,   genZhad);
+     if ( genZhad->size() ){
+         const reco::Candidate& Zhad = (*genZhad)[0];
+         const reco::Candidate* q1 = Zhad.daughter(0);
+         const reco::Candidate* q2 = Zhad.numberOfDaughters()>1 ? Zhad.daughter(1) : q1;
 
-     genptZl          = Zlep.pt();
-     genetaZl         = Zlep.eta();
-     genphiZl         = Zlep.phi();
-     genmassZl        = Zlep.mass();
+         genptZh          = Zhad.pt();
+         genetaZh         = Zhad.eta();
+         genphzZh         = Zhad.phi();
+         genmassZh        = Zhad.mass();
 
-     genptZh          = Zhad.pt();
-     genetaZh         = Zhad.eta();
-     genphzZh         = Zhad.phi();
-     genmassZh       = Zhad.mass();
+         genptq1          = q1->pt();
+         genetaq1         = q1->eta();
+         genphiq1         = q1->phi();
+         genmassq1        = q1->mass();
 
-     genptl1          = lep1->pt();
-     genetal1         = lep1->eta();
-     genphil1         = lep1->phi();
-     genmassl1        = lep1->mass();
-     
-     genptl2          = lep2->pt();
-     genetal2         = lep2->eta();
-     genphil2         = lep2->phi();
-     genmassl2       = lep2->mass();
-
-     genptq1          = q1->pt();
-     genetaq1         = q1->eta();
-     genphiq1         = q1->phi();
-     genmassq1        = q1->mass();
-
-     genptq2          = q2->pt();
-     genetaq2         = q2->eta();
-     genphiq2         = q2->phi();
-     genmassq2        = q2->mass();
-     
-     genptG           = genGrav->pt();
-     genetaG          = genGrav->eta();
-     genphiG          = genGrav->phi();
-     genmassG         = genGrav->mass();
+         genptq2          = q2->pt();
+         genetaq2         = q2->eta();
+         genphiq2         = q2->phi();
+         genmassq2        = q2->mass();
+     }
    }
 
    if(passed_analysis){
@@ -934,6 +944,7 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
    pileupWeight  = 1.0;
    lumiWeight    = 1.0;
    leptonWeight  = 1.0;
+   ewkWeight     = 1.0;
    genWeight     = 1.0;
    if( !isData_ ) {
      // pileup reweight
@@ -967,8 +978,11 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
          int bin2 = ptlep2<120. ? h4->FindBin(fabs(etalep2),ptlep2) : h4->FindBin(fabs(etalep2),119.);
          leptonWeight = h3->GetBinContent(bin1) * h4->GetBinContent(bin2);
      }
+     // Electroweak correction
+     if ( genptZl>150. )
+         ewkWeight = genptZl<2680. ? g1->Eval(genptZl) : g1->Eval(2680.);
    }
-   totalWeight = triggerWeight*pileupWeight*genWeight*lumiWeight*leptonWeight;
+   totalWeight = triggerWeight*pileupWeight*genWeight*lumiWeight*leptonWeight*ewkWeight;
    
    // Enumarate regions
    enum {
@@ -1004,6 +1018,7 @@ void EDBRTreeMaker::setDummyValues() {
      pileupWeight     = -1e4;
      lumiWeight       = -1e4;
      leptonWeight     = -1e4;
+     ewkWeight        = -1e4;
      totalWeight      = -1e4;
      candMass         = -1e4;
      ptVlep           = -1e4;
@@ -1179,10 +1194,12 @@ void EDBRTreeMaker::beginJob(){
         f1 = new TFile( puWeights_.fullPath().c_str() );
         f2 = new TFile( egammaSFs_.fullPath().c_str() );
         f3 = new TFile(   muonSFs_.fullPath().c_str() );
+        f4 = new TFile(ewkCorrect_.fullPath().c_str() );
         h1 = (TH1D*)f1->Get("pileupWeights");
         h2 = (TH2F*)f2->Get("EGamma_SF2D");
         h3 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt53/abseta_pTtuneP_ratio");
         h4 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt20/abseta_pTtuneP_ratio");
+        g1 = (TF1*)f4->Get("ewkZcorrection"); 
      }
 }
 

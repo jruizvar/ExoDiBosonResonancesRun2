@@ -16,6 +16,8 @@ process.load("ExoDiBosonResonances.EDBRCommon.goodJets_cff")
 process.load("ExoDiBosonResonances.EDBRCommon.hltFilter_cff")
 process.load("ExoDiBosonResonances.EDBRCommon.leptonicZ_cff")
 process.load("ExoDiBosonResonances.EDBRCommon.hadronicZ_cff")
+process.load("ExoDiBosonResonances.EDBRGenStudies.selectLeptonicDecay")
+process.load("ExoDiBosonResonances.EDBRGenStudies.selectHadronicDecay")
 process.load("ExoDiBosonResonances.EDBRCommon.simulation.Fall15MiniAOD76X."+SAMPLE)
 process.load("ExoDiBosonResonances.EDBRLeptons.goodLeptonsProducer_cff")
 
@@ -63,13 +65,20 @@ usedHLT = triggerPath[TRIGGER]
 
 process.hltFilter.triggerConditions =  ( usedHLT, )
 
+process.hadronicDecay.cut     = cms.string("22<abs(pdgId())<26 & 0<abs(daughter(0).pdgId())<6") 
+process.hadronicDecay.filter  = cms.bool(False)
+
 if TRIGGER == "el" :
+    process.leptonicDecay.cut     = cms.string("abs(pdgId())==23 & (abs(daughter(0).pdgId())==11 & abs(daughter(1).pdgId())==11)") 
+    process.leptonicDecay.filter  = cms.bool(False)
     process.kinElectrons.filter   = cms.bool(True)
     process.idElectrons.filter    = cms.bool(True)
     process.leptonicVFilter.src   = "Ztoee"
     process.ZdaughterCharge.src   = "Ztoee"
 
 if TRIGGER == "mu" :
+    process.leptonicDecay.cut     = cms.string("abs(pdgId())==23 & (abs(daughter(0).pdgId())==13 & abs(daughter(1).pdgId())==13)") 
+    process.leptonicDecay.filter  = cms.bool(False)
     process.kinMuons.filter       = cms.bool(True)
     process.idMuons.filter        = cms.bool(True)
     process.leptonicVFilter.src   = "Ztomumu"
@@ -114,16 +123,20 @@ process.gravitonFilter =  cms.EDFilter(  "CandViewCountFilter",
 process.treeDumper = cms.EDAnalyzer(     "EDBRTreeMaker",
                                           isGen           = cms.bool      (  False                     ),
                                           isData          = cms.bool      (  False                     ),
+                                          isSignal        = cms.bool      (  True                      ),
                                           originalNEvents = cms.int32     (  usedNevents               ),
                                           crossSectionPb  = cms.double    (  usedXsec                  ),
-                                          targetLumiInvPb = cms.double    (  2630.245                  ),
+                                          targetLumiInvPb = cms.double    (  2690.55                   ),
                                           EDBRChannel     = cms.string    ( "VZ_CHANNEL"               ),
                                           puWeights       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/pileupWeights69mb.root"),
                                           egammaSFs       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/CutBasedID_LooseWP_76X_18Feb.txt_SF2D.root"),
                                           muonSFs         = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonHighPt_Z_RunCD_Reco74X_Dec17.root"),
+                                          ewkCorrect      = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/ElectroweakCorrections.root"),
                                           vertex          = cms.InputTag  ( "goodOfflinePrimaryVertex" ))
 
-process.analysis = cms.Path(              process.hltSequence              +
+process.analysis = cms.Path(              process.leptonicDecay            + 
+                                          process.hadronicDecay            + 
+                                          process.hltSequence              +
                                           process.goodLeptonsProducer      +  
                                           process.leptonicVSequence        +
                                           process.bestLeptonicV            +
