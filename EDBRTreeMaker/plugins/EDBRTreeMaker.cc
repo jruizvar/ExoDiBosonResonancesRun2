@@ -54,7 +54,6 @@ private:
   // Parameters to steer the treeDumper
   bool isGen_;
   bool isData_;
-  bool isSignal_;
   int originalNEvents_;
   double crossSectionPb_;
   double targetLumiInvPb_;
@@ -62,6 +61,10 @@ private:
   edm::FileInPath puWeights_;
   edm::FileInPath egammaSFs_;
   edm::FileInPath   muonSFs_;
+  edm::FileInPath  muIsoSFs_;
+  edm::FileInPath elrecoSFs_;
+  edm::FileInPath eltriggerSFs_;
+  edm::FileInPath mutriggerSFs_;
   edm::FileInPath ewkCorrect_;
   edm::EDGetTokenT<reco::VertexCollection> vertexToken_;
   edm::EDGetTokenT<bool> elHltToken;
@@ -90,7 +93,7 @@ private:
   int numCands;
   int nevent, run, lumisec;
   int channel, lep, reg;
-  double triggerWeight, lumiWeight, pileupWeight, genWeight, leptonWeight, ewkWeight;
+  double recoWeight, triggerWeight, lumiWeight, pileupWeight, genWeight, leptonWeight, ewkWeight;
   double totalWeight;
   int trigger;
 
@@ -177,6 +180,8 @@ private:
   int    passConVeto1,     passConVeto2;
 
   // Muon ID 
+  int    looseMu1,         looseMu2;
+  int    tightMu1,         tightMu2;
   int    highPtMu1,        highPtMu2;
   int    trackerMu1,       trackerMu2;
   int    isPF1,            isPF2;
@@ -195,10 +200,10 @@ private:
 
   edm::Service<TFileService> fs;
   TTree* outTree_;
-  TFile *f1, *f2, *f3, *f4;
+  TFile *f1, *f2, *f3, *f4, *f5, *f6, *f7, *f8;
   TF1   *g1;
   TH1D  *h1;
-  TH2F  *h2, *h3, *h4;
+  TH2F  *h2, *h3, *h4, *h5, *h6, *h7;
 
 };
 
@@ -216,15 +221,26 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
        isData_ = iConfig.getParameter<bool> ("isData");
   else isData_ = true;
 
-  if( iConfig.existsAs<bool>("isSignal") )
-    isSignal_ = iConfig.getParameter<bool> ("isSignal");
-  else isSignal_ = false;
+  if( iConfig.existsAs<FileInPath>("elrecoSFs") )
+       elrecoSFs_ = iConfig.getParameter<FileInPath>("elrecoSFs") ;
 
   if( iConfig.existsAs<FileInPath>("egammaSFs") )
        egammaSFs_ = iConfig.getParameter<FileInPath>("egammaSFs") ;
 
   if( iConfig.existsAs<FileInPath>("muonSFs") )
        muonSFs_ = iConfig.getParameter<FileInPath>("muonSFs") ;
+
+  if( iConfig.existsAs<FileInPath>("muIsoSFs") )
+       muIsoSFs_ = iConfig.getParameter<FileInPath>("muIsoSFs") ;
+
+  if( iConfig.existsAs<FileInPath>("elrecoSFs") )
+       elrecoSFs_ = iConfig.getParameter<FileInPath>("elrecoSFs") ;
+
+  if( iConfig.existsAs<FileInPath>("eltriggerSFs") )
+       eltriggerSFs_ = iConfig.getParameter<FileInPath>("eltriggerSFs") ;
+
+  if( iConfig.existsAs<FileInPath>("mutriggerSFs") )
+       mutriggerSFs_ = iConfig.getParameter<FileInPath>("mutriggerSFs") ;
 
   if( iConfig.existsAs<FileInPath>("puWeights") )
        puWeights_ = iConfig.getParameter<FileInPath>("puWeights") ;
@@ -344,6 +360,10 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("deltaPtlep2Obj"   ,&deltaPtlep2Obj   ,"deltaPtlep2Obj/D"  );
  
   // Muon ID quantities
+  outTree_->Branch("looseMu1"         ,&looseMu1         ,"looseMu1/I"        );
+  outTree_->Branch("looseMu2"         ,&looseMu2         ,"looseMu2/I"        );
+  outTree_->Branch("tightMu1"         ,&tightMu1         ,"tightMu1/I"        );
+  outTree_->Branch("tightMu2"         ,&tightMu2         ,"tightMu2/I"        );
   outTree_->Branch("trackerMu1"       ,&trackerMu1       ,"trackerMu1/I"      );
   outTree_->Branch("trackerMu2"       ,&trackerMu2       ,"trackerMu2/I"      );
   outTree_->Branch("highPtMu1"        ,&highPtMu1        ,"highPtMu1/I"       );
@@ -461,6 +481,7 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("metPhi"           ,&metPhi           ,"metPhi/D"          );
   
   // Other quantities
+  outTree_->Branch("recoWeight"       ,&recoWeight       ,"recoWeight/D"      );
   outTree_->Branch("triggerWeight"    ,&triggerWeight    ,"triggerWeight/D"   );
   outTree_->Branch("lumiWeight"       ,&lumiWeight       ,"lumiWeight/D"      );
   outTree_->Branch("pileupWeight"     ,&pileupWeight     ,"pileupWeight/D"    );
@@ -474,8 +495,8 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("delPhijetmet"     ,&delPhijetmet     ,"delPhijetmet/D"    );
   outTree_->Branch("deltaphijetmet"   ,&deltaphijetmet   ,"deltaphijetmet/D"  );
   outTree_->Branch("passedtrigger"    ,&trigger          ,"passedtrigger/I"   );
-  outTree_->Branch("passVlep"         ,&passVlep         ,"passVlep/I"   );
-  outTree_->Branch("passVhad"         ,&passVhad         ,"passVhad/I"   );
+  outTree_->Branch("passVlep"         ,&passVlep         ,"passVlep/I"        );
+  outTree_->Branch("passVhad"         ,&passVhad         ,"passVhad/I"        );
   
 }
 
@@ -504,7 +525,7 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
    bool passed_analysis= iEvent.triggerResultsByName("TEST").accept("analysis"); // basically just generator selection for correct flavor semi-leptonic decay
 
    // save generator information
-   if(isSignal_ && not iEvent.isRealData() && passed_analysis){ // event may not have the proper info if it hasn't passed
+   if( not iEvent.isRealData() && passed_analysis ){ // event may not have the proper info if it hasn't passed
      Handle< reco::CandidateCollection > genZlep;
      iEvent.getByToken(genleptonicZ_ ,   genZlep);
      if( genZlep->size() ){
@@ -719,21 +740,17 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                         deltaPtlep2Obj   =      (*deltaPt_handle)[mu2Ptr];
                         matchHlt1        = (int)(*matchHlt_handle)[mu1Ptr]; 
                         matchHlt2        = (int)(*matchHlt_handle)[mu2Ptr]; 
-                        reco::MuonPFIsolation iso03R1 = mu1->pfIsolationR03();
-                        reco::MuonPFIsolation iso03R2 = mu2->pfIsolationR03();
-                        reco::MuonPFIsolation iso04R1 = mu1->pfIsolationR04();
-                        reco::MuonPFIsolation iso04R2 = mu2->pfIsolationR04();
                         // isolation with delta beta correction
-                        double absIso03R1 = iso03R1.sumChargedHadronPt + std::max(0.0,  iso03R1.sumNeutralHadronEt + iso03R1.sumPhotonEt - 0.5*iso03R1.sumPUPt );
-                        double absIso03R2 = iso03R2.sumChargedHadronPt + std::max(0.0,  iso03R2.sumNeutralHadronEt + iso03R2.sumPhotonEt - 0.5*iso03R2.sumPUPt );
-                        double absIso04R1 = iso04R1.sumChargedHadronPt + std::max(0.0,  iso04R1.sumNeutralHadronEt + iso04R1.sumPhotonEt - 0.5*iso04R1.sumPUPt );
-                        double absIso04R2 = iso04R2.sumChargedHadronPt + std::max(0.0,  iso04R2.sumNeutralHadronEt + iso04R2.sumPhotonEt - 0.5*iso04R2.sumPUPt );
-                        pfIso03R1         = absIso03R1/mu1->pt();
-                        pfIso03R2         = absIso03R2/mu2->pt();
-                        pfIso04R1         = absIso04R1/mu1->pt();
-                        pfIso04R2         = absIso04R2/mu2->pt();
+                        pfIso03R1         = mu1->userFloat("pfIso03R");;
+                        pfIso03R2         = mu2->userFloat("pfIso03R");;
+                        pfIso04R1         = mu1->userFloat("pfIso04R");;
+                        pfIso04R2         = mu2->userFloat("pfIso04R");;
                         trackerMu1        = (int)hptm::isTrackerMuon(*mu1, vertex);
                         trackerMu2        = (int)hptm::isTrackerMuon(*mu2, vertex);
+                        looseMu1          = (int)muon::isLooseMuon(  *mu1);
+                        looseMu2          = (int)muon::isLooseMuon(  *mu2);
+                        tightMu1          = (int)muon::isTightMuon(  *mu1, vertex);
+                        tightMu2          = (int)muon::isTightMuon(  *mu2, vertex);
                         highPtMu1         = (int)muon::isHighPtMuon( *mu1, vertex);
                         highPtMu2         = (int)muon::isHighPtMuon( *mu2, vertex);
                         isPF1             = mu1->isPFMuon();
@@ -940,6 +957,7 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
    }// end passed trigger && passed analysis
 
    /// For data, all weights are equal to 1.
+   recoWeight    = 1.0;
    triggerWeight = 1.0;
    pileupWeight  = 1.0;
    lumiWeight    = 1.0;
@@ -974,15 +992,39 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
      }
      // Muon Scale Factor
      if ( lep==13 ){
-         int bin1 = ptlep1<300. ? h3->FindBin(fabs(etalep1),ptlep1) : h3->FindBin(fabs(etalep1),299.);
-         int bin2 = ptlep2<120. ? h4->FindBin(fabs(etalep2),ptlep2) : h4->FindBin(fabs(etalep2),119.);
-         leptonWeight = h3->GetBinContent(bin1) * h4->GetBinContent(bin2);
+         int bin1 = ptlep1<120. ? h3->FindBin(fabs(etalep1),ptlep1) : h3->FindBin(fabs(etalep1),119.);
+         int bin2 = ptlep2<120. ? h3->FindBin(fabs(etalep2),ptlep2) : h3->FindBin(fabs(etalep2),119.);
+         int bin3 = ptlep1<120. ? h4->FindBin(fabs(etalep1),ptlep1) : h4->FindBin(fabs(etalep1),119.);
+         int bin4 = ptlep2<120. ? h4->FindBin(fabs(etalep2),ptlep2) : h4->FindBin(fabs(etalep2),119.);
+         leptonWeight = h3->GetBinContent(bin1) * h3->GetBinContent(bin2) * //  ID SF
+                        h4->GetBinContent(bin3) * h4->GetBinContent(bin4) ; // Iso SF
+     }
+     // Trigger Scale Factor
+     if ( lep==11 ){
+         int bin = ptlep1<1000. ? h5->FindBin(etaSC1,ptlep1) : h5->FindBin(etaSC1,999.);
+         triggerWeight = h5->GetBinContent(bin) ;
+     }
+     if ( lep==13 ){
+         if ( fabs(etalep1)<2.1 ){
+            int bin = ptlep1<120. ? h6->FindBin(fabs(etalep1),ptlep1) : h6->FindBin(fabs(etalep1),119.);
+            triggerWeight = h6->GetBinContent(bin) ;
+         }
+         else {
+            int bin = ptlep2<120. ? h6->FindBin(fabs(etalep2),ptlep2) : h6->FindBin(fabs(etalep2),119.);
+            triggerWeight = h6->GetBinContent(bin) ;
+         }
+     }
+     // Reco scale factor
+     if ( lep==11 ){
+         int bin1 = ptlep1<200. ? h7->FindBin(etaSC1,ptlep1) : h7->FindBin(etaSC1,199.);
+         int bin2 = ptlep2<200. ? h7->FindBin(etaSC2,ptlep2) : h7->FindBin(etaSC2,199.);
+         recoWeight = h7->GetBinContent(bin1) * h7->GetBinContent(bin2);
      }
      // Electroweak correction
      if ( genptZl>150. )
          ewkWeight = genptZl<2680. ? g1->Eval(genptZl) : g1->Eval(2680.);
    }
-   totalWeight = triggerWeight*pileupWeight*genWeight*lumiWeight*leptonWeight*ewkWeight;
+   totalWeight = recoWeight*triggerWeight*pileupWeight*genWeight*lumiWeight*leptonWeight;
    
    // Enumarate regions
    enum {
@@ -1014,6 +1056,7 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
 
 void EDBRTreeMaker::setDummyValues() {
      nVtx             = -1e4;
+     recoWeight       = -1e4;
      triggerWeight    = -1e4;
      pileupWeight     = -1e4;
      lumiWeight       = -1e4;
@@ -1128,6 +1171,10 @@ void EDBRTreeMaker::setDummyValues() {
      heep2            = -1e4; 
      LOOSE2           = -1e4; 
      loose2           = -1e4; 
+     looseMu1         = -1e4;
+     looseMu2         = -1e4;
+     tightMu1         = -1e4;
+     tightMu2         = -1e4;
      trackerMu1       = -1e4;
      trackerMu2       = -1e4;
      highPtMu1        = -1e4;
@@ -1191,15 +1238,22 @@ void EDBRTreeMaker::setDummyValues() {
 
 void EDBRTreeMaker::beginJob(){ 
      if ( !isData_ ){
-        f1 = new TFile( puWeights_.fullPath().c_str() );
-        f2 = new TFile( egammaSFs_.fullPath().c_str() );
-        f3 = new TFile(   muonSFs_.fullPath().c_str() );
-        f4 = new TFile(ewkCorrect_.fullPath().c_str() );
+        f1 = new TFile(   puWeights_.fullPath().c_str() );
+        f2 = new TFile(   egammaSFs_.fullPath().c_str() );
+        f3 = new TFile(     muonSFs_.fullPath().c_str() );
+        f4 = new TFile(  ewkCorrect_.fullPath().c_str() );
+        f5 = new TFile(eltriggerSFs_.fullPath().c_str() );
+        f6 = new TFile(mutriggerSFs_.fullPath().c_str() );
+        f7 = new TFile(   elrecoSFs_.fullPath().c_str() );
+        f8 = new TFile(    muIsoSFs_.fullPath().c_str() );
         h1 = (TH1D*)f1->Get("pileupWeights");
         h2 = (TH2F*)f2->Get("EGamma_SF2D");
-        h3 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt53/abseta_pTtuneP_ratio");
-        h4 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt20/abseta_pTtuneP_ratio");
-        g1 = (TF1*)f4->Get("ewkZcorrection"); 
+        h3 = (TH2F*)f3->Get("MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio");
+        h4 = (TH2F*)f8->Get("MC_NUM_LooseRelIso_DEN_TightID_PAR_pt_spliteta_bin1/abseta_pt_ratio");
+        h5 = (TH2F*)f5->Get("HLT_Ele105_PtEtaBins/eta_pt_sf");
+        h6 = (TH2F*)f6->Get("runD_Mu45_eta2p1_PtEtaBins/abseta_pt_ratio");
+        h7 = (TH2F*)f7->Get("EGamma_SF2D");
+        g1 = (TF1*) f4->Get("ewkZcorrection"); 
      }
 }
 

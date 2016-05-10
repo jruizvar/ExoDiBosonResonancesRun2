@@ -23,19 +23,19 @@ process.load("ExoDiBosonResonances.EDBRLeptons.goodLeptonsProducer_cff")
 
 process.maxEvents.input = -1 
 
-configXsecs = {  "BulkGravToZZToZlepZhad_M-600"         : 7.3592E-05,
-                 "BulkGravToZZToZlepZhad_M-800"         : 7.3592E-05,
-                 "BulkGravToZZToZlepZhad_M-1000"        : 1.9648E-05,
-                 "BulkGravToZZToZlepZhad_M-1200"        : 6.5205E-06,
-                 "BulkGravToZZToZlepZhad_M-1400"        : 2.4833E-06,
-                 "BulkGravToZZToZlepZhad_M-1600"        : 8.1645E-07,
-                 "BulkGravToZZToZlepZhad_M-1800"        : 3.7583E-07,
-                 "BulkGravToZZToZlepZhad_M-2000"        : 2.2636E-07,
-                 "BulkGravToZZToZlepZhad_M-2500"        : 4.2349E-08,
-                 "BulkGravToZZToZlepZhad_M-3000"        : 9.2671E-09,
-                 "BulkGravToZZToZlepZhad_M-3500"        : 4.7064E-09,
-                 "BulkGravToZZToZlepZhad_M-4000"        : 1.9530E-09,
-                 "BulkGravToZZToZlepZhad_M-4500"        : 8.9900E-10,
+configXsecs = {  "BulkGravToZZToZlepZhad_M-600"         : 1.0,
+                 "BulkGravToZZToZlepZhad_M-800"         : 1.0,
+                 "BulkGravToZZToZlepZhad_M-1000"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-1200"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-1400"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-1600"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-1800"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-2000"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-2500"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-3000"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-3500"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-4000"        : 1.0,
+                 "BulkGravToZZToZlepZhad_M-4500"        : 1.0,
               }
 
 configNevents = {"BulkGravToZZToZlepZhad_M-600"         : 50000,
@@ -61,7 +61,7 @@ triggerPath = {
                 "el" : "HLT_Ele105_CaloIdVT_GsfTrkIdT_v*",
                 "mu" : "HLT_Mu45_eta2p1_v*",
               }
-usedHLT = triggerPath[TRIGGER]
+usedHLT       = triggerPath[TRIGGER]
 
 process.hltFilter.triggerConditions =  ( usedHLT, )
 
@@ -123,14 +123,17 @@ process.gravitonFilter =  cms.EDFilter(  "CandViewCountFilter",
 process.treeDumper = cms.EDAnalyzer(     "EDBRTreeMaker",
                                           isGen           = cms.bool      (  False                     ),
                                           isData          = cms.bool      (  False                     ),
-                                          isSignal        = cms.bool      (  True                      ),
                                           originalNEvents = cms.int32     (  usedNevents               ),
                                           crossSectionPb  = cms.double    (  usedXsec                  ),
                                           targetLumiInvPb = cms.double    (  2690.55                   ),
                                           EDBRChannel     = cms.string    ( "VZ_CHANNEL"               ),
                                           puWeights       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/pileupWeights69mb.root"),
                                           egammaSFs       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/CutBasedID_LooseWP_76X_18Feb.txt_SF2D.root"),
-                                          muonSFs         = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonHighPt_Z_RunCD_Reco74X_Dec17.root"),
+                                          muonSFs         = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonID_Z_RunCD_Reco76X_Feb15.root"),
+                                          muIsoSFs        = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonIso_Z_RunCD_Reco76X_Feb15.root"),
+                                          elrecoSFs       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/eleRECO_SF2D.root"),
+                                          eltriggerSFs    = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/HLT_Ele105_scalefactors76X.root"),
+                                          mutriggerSFs    = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/SingleMuonTrigger_Z_RunCD_Reco76X_Feb15.root"),
                                           ewkCorrect      = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/ElectroweakCorrections.root"),
                                           vertex          = cms.InputTag  ( "goodOfflinePrimaryVertex" ))
 

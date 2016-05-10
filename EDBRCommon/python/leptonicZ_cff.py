@@ -17,6 +17,9 @@ regularIso                   =  "? deltaR(daughter(0).eta,daughter(0).phi,daught
                                    daughter(0).userFloat('trackIso')/daughter(0).pt < 0.1 & \
                                    daughter(1).userFloat('trackIso')/daughter(1).pt < 0.1 ? 1 : 0"
 
+looseIso                     =    "daughter(0).userFloat('pfIso04R') < 0.25 & \
+                                   daughter(1).userFloat('pfIso04R') < 0.25 "
+
 Ztoee = cms.EDProducer(           "CandViewCombiner",
                                    decay = cms.string("idElectrons idElectrons"),
                                    cut = cms.string("(daughter(0).pt > 115 || daughter(1).pt > 115)"),
@@ -43,7 +46,7 @@ ZdaughterCharge = cms.EDFilter(   "CandViewSelector",
 
 ZdaughterIso = cms.EDFilter(      "CandViewSelector",
                                    src = cms.InputTag("ZdaughterCharge"),
-                                   cut = cms.string( boostedIso +" || "+ regularIso ),
+                                   cut = cms.string( looseIso ),
                                    filter = cms.bool(True) )
 
 leptonicVSelector = cms.EDFilter( "CandViewSelector",

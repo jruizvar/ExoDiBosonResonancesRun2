@@ -51,7 +51,7 @@ kinMuons = cms.EDFilter("PATMuonSelector",
 
 idMuons = cms.EDFilter("PATMuonSelector",
                                        src = cms.InputTag("kinMuons"),
-                                       cut = cms.string("userInt('isTracker') == 1 || userInt('isHighPt') == 1"))
+                                       cut = cms.string("userInt('isTightMu') == 1"))
 
 goodLeptonsProducer = cms.Sequence(    goodOfflinePrimaryVertex       +
                                        electronsMiniIsolationValueMap +
