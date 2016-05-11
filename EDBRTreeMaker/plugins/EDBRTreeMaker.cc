@@ -1011,24 +1011,24 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
      }
      // Trigger Scale Factor
      if ( lep==11 ){
-         int bin = ptlep1<1000. ? h5->FindBin(etaSC1,ptlep1) : h5->FindBin(etaSC1,999.);
-         triggerWeight = h5->GetBinContent(bin) ;
+         int bin = ptlep1<1000. ? h7->FindBin(etaSC1,ptlep1) : h7->FindBin(etaSC1,999.);
+         triggerWeight = h7->GetBinContent(bin) ;
      }
      if ( lep==13 ){
          if ( fabs(etalep1)<2.1 ){
-            int bin = ptlep1<120. ? h6->FindBin(fabs(etalep1),ptlep1) : h6->FindBin(fabs(etalep1),119.);
-            triggerWeight = h6->GetBinContent(bin) ;
+            int bin = ptlep1<120. ? h8->FindBin(fabs(etalep1),ptlep1) : h8->FindBin(fabs(etalep1),119.);
+            triggerWeight = h8->GetBinContent(bin) ;
          }
          else {
-            int bin = ptlep2<120. ? h6->FindBin(fabs(etalep2),ptlep2) : h6->FindBin(fabs(etalep2),119.);
-            triggerWeight = h6->GetBinContent(bin) ;
+            int bin = ptlep2<120. ? h8->FindBin(fabs(etalep2),ptlep2) : h8->FindBin(fabs(etalep2),119.);
+            triggerWeight = h8->GetBinContent(bin) ;
          }
      }
      // Reco scale factor
      if ( lep==11 ){
-         int bin1 = ptlep1<200. ? h7->FindBin(etaSC1,ptlep1) : h7->FindBin(etaSC1,199.);
-         int bin2 = ptlep2<200. ? h7->FindBin(etaSC2,ptlep2) : h7->FindBin(etaSC2,199.);
-         recoWeight = h7->GetBinContent(bin1) * h7->GetBinContent(bin2);
+         int bin1 = ptlep1<200. ? h9->FindBin(etaSC1,ptlep1) : h9->FindBin(etaSC1,199.);
+         int bin2 = ptlep2<200. ? h9->FindBin(etaSC2,ptlep2) : h9->FindBin(etaSC2,199.);
+         recoWeight = h9->GetBinContent(bin1) * h9->GetBinContent(bin2);
      }
      // Electroweak correction
      //if ( genptZl>150. )
