@@ -26,7 +26,7 @@ sed -i '6 s/WZ/ZZ/' crabConfig.py
 crab submit Data.inputDataset='/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
 
 sed -i '6 s/ZZ/TT/' crabConfig.py
-crab submit Data.inputDataset='/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
+crab submit Data.inputDataset='/TTJets_13TeV-amcatnloFXFX-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM' Data.unitsPerJob=7000
 
 # Switch to electron channel
 sed -i '6,12 s/mu/el/' crabConfig.py
@@ -53,7 +53,7 @@ sed -i '6 s/WZ/ZZ/' crabConfig.py
 crab submit Data.inputDataset='/ZZ_TuneCUETP8M1_13TeV-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
 
 sed -i '6 s/ZZ/TT/' crabConfig.py
-crab submit Data.inputDataset='/TT_TuneCUETP8M1_13TeV-amcatnlo-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12-v1/MINIAODSIM'
+crab submit Data.inputDataset='/TTJets_13TeV-amcatnloFXFX-pythia8/RunIIFall15MiniAODv2-PU25nsData2015v1_76X_mcRun2_asymptotic_v12_ext1-v1/MINIAODSIM' Data.unitsPerJob=7000
 
 # Switch back to muon channel
 sed -i '6,12 s/el/mu/' crabConfig.py

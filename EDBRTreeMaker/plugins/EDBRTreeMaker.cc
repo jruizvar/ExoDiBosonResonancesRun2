@@ -181,6 +181,7 @@ private:
 
   // Muon ID 
   int    looseMu1,         looseMu2;
+  int    mediumMu1,        mediumMu2;
   int    tightMu1,         tightMu2;
   int    highPtMu1,        highPtMu2;
   int    trackerMu1,       trackerMu2;
@@ -362,6 +363,8 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   // Muon ID quantities
   outTree_->Branch("looseMu1"         ,&looseMu1         ,"looseMu1/I"        );
   outTree_->Branch("looseMu2"         ,&looseMu2         ,"looseMu2/I"        );
+  outTree_->Branch("mediumMu1"        ,&mediumMu1        ,"mediumMu1/I"       );
+  outTree_->Branch("mediumMu2"        ,&mediumMu2        ,"mediumMu2/I"       );
   outTree_->Branch("tightMu1"         ,&tightMu1         ,"tightMu1/I"        );
   outTree_->Branch("tightMu2"         ,&tightMu2         ,"tightMu2/I"        );
   outTree_->Branch("trackerMu1"       ,&trackerMu1       ,"trackerMu1/I"      );
@@ -749,6 +752,8 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                         trackerMu2        = (int)hptm::isTrackerMuon(*mu2, vertex);
                         looseMu1          = (int)muon::isLooseMuon(  *mu1);
                         looseMu2          = (int)muon::isLooseMuon(  *mu2);
+                        mediumMu1         = (int)muon::isMediumMuon( *mu1);
+                        mediumMu2         = (int)muon::isMediumMuon( *mu2);
                         tightMu1          = (int)muon::isTightMuon(  *mu1, vertex);
                         tightMu2          = (int)muon::isTightMuon(  *mu2, vertex);
                         highPtMu1         = (int)muon::isHighPtMuon( *mu1, vertex);
@@ -1173,6 +1178,8 @@ void EDBRTreeMaker::setDummyValues() {
      loose2           = -1e4; 
      looseMu1         = -1e4;
      looseMu2         = -1e4;
+     mediumMu1        = -1e4;
+     mediumMu2        = -1e4;
      tightMu1         = -1e4;
      tightMu2         = -1e4;
      trackerMu1       = -1e4;
@@ -1248,7 +1255,7 @@ void EDBRTreeMaker::beginJob(){
         f8 = new TFile(    muIsoSFs_.fullPath().c_str() );
         h1 = (TH1D*)f1->Get("pileupWeights");
         h2 = (TH2F*)f2->Get("EGamma_SF2D");
-        h3 = (TH2F*)f3->Get("MC_NUM_TightIDandIPCut_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio");
+        h3 = (TH2F*)f3->Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio");
         h4 = (TH2F*)f8->Get("MC_NUM_LooseRelIso_DEN_TightID_PAR_pt_spliteta_bin1/abseta_pt_ratio");
         h5 = (TH2F*)f5->Get("HLT_Ele105_PtEtaBins/eta_pt_sf");
         h6 = (TH2F*)f6->Get("runD_Mu45_eta2p1_PtEtaBins/abseta_pt_ratio");

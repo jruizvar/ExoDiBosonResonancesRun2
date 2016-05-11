@@ -138,10 +138,12 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         bool  trackerMu    = hptm::isTrackerMuon(mu, vertex);  
         bool  highPtMu     = muon::isHighPtMuon( mu, vertex);  
         bool  tightMu      = muon::isTightMuon(  mu, vertex);  
+        bool  mediumMu     = muon::isMediumMuon( mu        );  
         bool  looseMu      = muon::isLooseMuon(  mu        );  
         pat::Muon* cloneMu = mu.clone();
         cloneMu->addUserInt("slimmedIndex", i            );
         cloneMu->addUserInt("isLooseMu",    looseMu      );
+        cloneMu->addUserInt("isMediumMu",   mediumMu     );
         cloneMu->addUserInt("isTightMu",    tightMu      );
         cloneMu->addUserInt("isTracker",    trackerMu    );
         cloneMu->addUserInt("isHighPt",     highPtMu     );

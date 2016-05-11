@@ -46,6 +46,7 @@ ZdaughterCharge = cms.EDFilter(   "CandViewSelector",
 
 ZdaughterIso = cms.EDFilter(      "CandViewSelector",
                                    src = cms.InputTag("ZdaughterCharge"),
+                                   #cut = cms.string( boostedIso +" || "+ regularIso ),
                                    cut = cms.string( looseIso ),
                                    filter = cms.bool(True) )
 
