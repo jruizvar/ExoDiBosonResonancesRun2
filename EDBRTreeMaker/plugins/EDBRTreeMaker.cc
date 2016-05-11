@@ -1256,7 +1256,7 @@ void EDBRTreeMaker::beginJob(){
         h1 = (TH1D*)f1->Get("pileupWeights");
         h2 = (TH2F*)f2->Get("EGamma_SF2D");
         h3 = (TH2F*)f3->Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio");
-        h4 = (TH2F*)f8->Get("MC_NUM_LooseRelIso_DEN_TightID_PAR_pt_spliteta_bin1/abseta_pt_ratio");
+        h4 = (TH2F*)f8->Get("MC_NUM_LooseRelIso_DEN_MediumID_PAR_pt_spliteta_bin1/abseta_pt_ratio");
         h5 = (TH2F*)f5->Get("HLT_Ele105_PtEtaBins/eta_pt_sf");
         h6 = (TH2F*)f6->Get("runD_Mu45_eta2p1_PtEtaBins/abseta_pt_ratio");
         h7 = (TH2F*)f7->Get("EGamma_SF2D");
