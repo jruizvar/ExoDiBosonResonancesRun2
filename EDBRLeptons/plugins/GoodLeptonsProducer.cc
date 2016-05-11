@@ -128,6 +128,8 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         const pat::Muon& mu    = (*muons)[i];
         reco::MuonPFIsolation iso03R = mu.pfIsolationR03();
         reco::MuonPFIsolation iso04R = mu.pfIsolationR04();
+        reco::TrackRef tunePBestTrack = mu.tunePMuonBestTrack();
+        double pTtuneP     = tunePBestTrack->pt();
         double absIso03R   = iso03R.sumChargedHadronPt + std::max(0.0,iso03R.sumNeutralHadronEt+iso03R.sumPhotonEt-0.5*iso03R.sumPUPt);
         double absIso04R   = iso04R.sumChargedHadronPt + std::max(0.0,iso04R.sumNeutralHadronEt+iso04R.sumPhotonEt-0.5*iso04R.sumPUPt);
         double pfIso03R    = absIso03R/mu.pt();
@@ -152,6 +154,7 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         cloneMu->addUserFloat("trackIso",   trackIso     );
         cloneMu->addUserFloat("innerPt",    innerPt      );
         cloneMu->addUserFloat("miniIso",    miniIso      );
+        cloneMu->addUserFloat("pTtuneP",    pTtuneP      );
         goodMuons->push_back(               *cloneMu     );
     }
 

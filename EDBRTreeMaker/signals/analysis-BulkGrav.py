@@ -129,12 +129,10 @@ process.treeDumper = cms.EDAnalyzer(     "EDBRTreeMaker",
                                           EDBRChannel     = cms.string    ( "VZ_CHANNEL"               ),
                                           puWeights       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/pileupWeights69mb.root"),
                                           egammaSFs       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/CutBasedID_LooseWP_76X_18Feb.txt_SF2D.root"),
-                                          muonSFs         = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonID_Z_RunCD_Reco76X_Feb15.root"),
-                                          muIsoSFs        = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonIso_Z_RunCD_Reco76X_Feb15.root"),
+                                          muonSFs         = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/MuonHighPt_Z_RunCD_Reco74X_Dec17.root"),
                                           elrecoSFs       = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/eleRECO_SF2D.root"),
                                           eltriggerSFs    = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/HLT_Ele105_scalefactors76X.root"),
                                           mutriggerSFs    = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/SingleMuonTrigger_Z_RunCD_Reco76X_Feb15.root"),
-                                          ewkCorrect      = cms.FileInPath( "ExoDiBosonResonances/EDBRTreeMaker/data/ElectroweakCorrections.root"),
                                           vertex          = cms.InputTag  ( "goodOfflinePrimaryVertex" ))
 
 process.analysis = cms.Path(              process.leptonicDecay            + 

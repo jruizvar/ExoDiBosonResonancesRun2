@@ -3,8 +3,8 @@ import FWCore.ParameterSet.Config as cms
 daughterID                   =  "( daughter(0).userInt('isHighPt')==1 || \
                                    daughter(1).userInt('isHighPt')==1 )"
 
-daughterKin                  =  "((daughter(0).pt > 50 & abs(daughter(0).eta) < 2.1) || \
-                                  (daughter(1).pt > 50 & abs(daughter(1).eta) < 2.1))"
+daughterKin                  =  "((daughter(0).userFloat('pTtuneP') > 50 & abs(daughter(0).eta) < 2.1) || \
+                                  (daughter(1).userFloat('pTtuneP') > 50 & abs(daughter(1).eta) < 2.1))"
 
 daughterCharge               =  "((daughter(0).charge == -daughter(1).charge) || \
                                   (daughter(0).pdgId  == -daughter(1).pdgId))"
@@ -46,8 +46,7 @@ ZdaughterCharge = cms.EDFilter(   "CandViewSelector",
 
 ZdaughterIso = cms.EDFilter(      "CandViewSelector",
                                    src = cms.InputTag("ZdaughterCharge"),
-                                   #cut = cms.string( boostedIso +" || "+ regularIso ),
-                                   cut = cms.string( looseIso ),
+                                   cut = cms.string( boostedIso +" || "+ regularIso ),
                                    filter = cms.bool(True) )
 
 leptonicVSelector = cms.EDFilter( "CandViewSelector",

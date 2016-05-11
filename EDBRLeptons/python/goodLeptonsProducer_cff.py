@@ -47,11 +47,11 @@ idElectrons = cms.EDFilter("PATElectronSelector",
 
 kinMuons = cms.EDFilter("PATMuonSelector",
                                        src = cms.InputTag("goodLeptons:Muons"),
-                                       cut = cms.string("pt > 20 & abs(eta) < 2.4"))
+                                       cut = cms.string("userFloat('pTtuneP') > 20 & abs(eta) < 2.4"))
 
 idMuons = cms.EDFilter("PATMuonSelector",
                                        src = cms.InputTag("kinMuons"),
-                                       cut = cms.string("userInt('isMediumMu') == 1"))
+                                       cut = cms.string("userInt('isTracker') == 1 || userInt('isHighPt') == 1"))
 
 goodLeptonsProducer = cms.Sequence(    goodOfflinePrimaryVertex       +
                                        electronsMiniIsolationValueMap +

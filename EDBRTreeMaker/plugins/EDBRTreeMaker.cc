@@ -196,15 +196,16 @@ private:
   double longiCut1,        longiCut2;
   double pfIso03R1,        pfIso03R2;
   double pfIso04R1,        pfIso04R2;
+  double pTtuneP1,         pTtuneP2;
 
   void setDummyValues();
 
   edm::Service<TFileService> fs;
   TTree* outTree_;
-  TFile *f1, *f2, *f3, *f4, *f5, *f6, *f7, *f8;
+  TFile *f1, *f2, *f3, *f4, *f5, *f6, *f7;
   TF1   *g1;
   TH1D  *h1;
-  TH2F  *h2, *h3, *h4, *h5, *h6, *h7;
+  TH2F  *h2, *h3, *h4, *h5, *h6, *h7, *h8, *h9;
 
 };
 
@@ -361,6 +362,8 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("deltaPtlep2Obj"   ,&deltaPtlep2Obj   ,"deltaPtlep2Obj/D"  );
  
   // Muon ID quantities
+  outTree_->Branch("pTtuneP1"         ,&pTtuneP1         ,"pTtuneP1/D"        );
+  outTree_->Branch("pTtuneP2"         ,&pTtuneP2         ,"pTtuneP2/D"        );
   outTree_->Branch("looseMu1"         ,&looseMu1         ,"looseMu1/I"        );
   outTree_->Branch("looseMu2"         ,&looseMu2         ,"looseMu2/I"        );
   outTree_->Branch("mediumMu1"        ,&mediumMu1        ,"mediumMu1/I"       );
@@ -768,6 +771,8 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                         matchedStations2  = mu2->numberOfMatchedStations();
                         trackIso1         = mu1->isolationR03().sumPt;                       // tracker isolation
                         trackIso2         = mu2->isolationR03().sumPt;                       // tracker isolation
+                        pTtuneP1          = mu1->userFloat("pTtuneP");
+                        pTtuneP2          = mu2->userFloat("pTtuneP");
                         if ( mu1->innerTrack().isNonnull() ){
                            pixelHits1     = mu1->innerTrack()->hitPattern().numberOfValidPixelHits();
                            trackerLayers1 = mu1->innerTrack()->hitPattern().trackerLayersWithMeasurement();
@@ -997,12 +1002,12 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
      }
      // Muon Scale Factor
      if ( lep==13 ){
-         int bin1 = ptlep1<120. ? h3->FindBin(fabs(etalep1),ptlep1) : h3->FindBin(fabs(etalep1),119.);
-         int bin2 = ptlep2<120. ? h3->FindBin(fabs(etalep2),ptlep2) : h3->FindBin(fabs(etalep2),119.);
-         int bin3 = ptlep1<120. ? h4->FindBin(fabs(etalep1),ptlep1) : h4->FindBin(fabs(etalep1),119.);
-         int bin4 = ptlep2<120. ? h4->FindBin(fabs(etalep2),ptlep2) : h4->FindBin(fabs(etalep2),119.);
-         leptonWeight = h3->GetBinContent(bin1) * h3->GetBinContent(bin2) * //  ID SF
-                        h4->GetBinContent(bin3) * h4->GetBinContent(bin4) ; // Iso SF
+         int bin1 = ptlep1<300. ? h3->FindBin(fabs(etalep1),ptlep1) : h3->FindBin(fabs(etalep1),299.);
+         int bin2 = ptlep2<120. ? h4->FindBin(fabs(etalep2),ptlep2) : h4->FindBin(fabs(etalep2),119.);
+         int bin3 = ptlep1<300. ? h5->FindBin(fabs(etalep1),ptlep1) : h5->FindBin(fabs(etalep1),299.);
+         int bin4 = ptlep2<120. ? h6->FindBin(fabs(etalep2),ptlep2) : h6->FindBin(fabs(etalep2),119.);
+         leptonWeight = h3->GetBinContent(bin1) * h4->GetBinContent(bin2) * //  ID SF
+                        h5->GetBinContent(bin3) * h6->GetBinContent(bin4) ; // Iso SF
      }
      // Trigger Scale Factor
      if ( lep==11 ){
@@ -1026,8 +1031,8 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
          recoWeight = h7->GetBinContent(bin1) * h7->GetBinContent(bin2);
      }
      // Electroweak correction
-     if ( genptZl>150. )
-         ewkWeight = genptZl<2680. ? g1->Eval(genptZl) : g1->Eval(2680.);
+     //if ( genptZl>150. )
+     //    ewkWeight = genptZl<2680. ? g1->Eval(genptZl) : g1->Eval(2680.);
    }
    totalWeight = recoWeight*triggerWeight*pileupWeight*genWeight*lumiWeight*leptonWeight;
    
@@ -1208,6 +1213,8 @@ void EDBRTreeMaker::setDummyValues() {
      pfIso03R2        = -1e4;
      pfIso04R1        = -1e4;
      pfIso04R2        = -1e4;
+     pTtuneP1         = -1e4;
+     pTtuneP2         = -1e4;
 
      genptZl          = -1e4;
      genptZh          = -1e4;
@@ -1248,19 +1255,20 @@ void EDBRTreeMaker::beginJob(){
         f1 = new TFile(   puWeights_.fullPath().c_str() );
         f2 = new TFile(   egammaSFs_.fullPath().c_str() );
         f3 = new TFile(     muonSFs_.fullPath().c_str() );
-        f4 = new TFile(  ewkCorrect_.fullPath().c_str() );
+        //f4 = new TFile(  ewkCorrect_.fullPath().c_str() );
         f5 = new TFile(eltriggerSFs_.fullPath().c_str() );
         f6 = new TFile(mutriggerSFs_.fullPath().c_str() );
         f7 = new TFile(   elrecoSFs_.fullPath().c_str() );
-        f8 = new TFile(    muIsoSFs_.fullPath().c_str() );
         h1 = (TH1D*)f1->Get("pileupWeights");
         h2 = (TH2F*)f2->Get("EGamma_SF2D");
-        h3 = (TH2F*)f3->Get("MC_NUM_MediumID_DEN_genTracks_PAR_pt_spliteta_bin1/abseta_pt_ratio");
-        h4 = (TH2F*)f8->Get("MC_NUM_LooseRelIso_DEN_MediumID_PAR_pt_spliteta_bin1/abseta_pt_ratio");
-        h5 = (TH2F*)f5->Get("HLT_Ele105_PtEtaBins/eta_pt_sf");
-        h6 = (TH2F*)f6->Get("runD_Mu45_eta2p1_PtEtaBins/abseta_pt_ratio");
-        h7 = (TH2F*)f7->Get("EGamma_SF2D");
-        g1 = (TF1*) f4->Get("ewkZcorrection"); 
+        h3 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt53/abseta_pTtuneP_ratio");
+        h4 = (TH2F*)f3->Get("HighPtID_PtEtaBins_Pt20/abseta_pTtuneP_ratio");
+        h5 = (TH2F*)f3->Get("tkRelIsoID_PtEtaBins_Pt53/abseta_pTtuneP_ratio");
+        h6 = (TH2F*)f3->Get("tkRelIsoID_PtEtaBins_Pt20/abseta_pTtuneP_ratio");
+        h7 = (TH2F*)f5->Get("HLT_Ele105_PtEtaBins/eta_pt_sf");
+        h8 = (TH2F*)f6->Get("runD_Mu45_eta2p1_PtEtaBins/abseta_pt_ratio");
+        h9 = (TH2F*)f7->Get("EGamma_SF2D");
+        //g1 = (TF1*) f4->Get("ewkZcorrection"); 
      }
 }
 
