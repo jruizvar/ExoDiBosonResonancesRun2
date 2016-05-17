@@ -4,6 +4,8 @@
 //
 // https://twiki.cern.ch/twiki/bin/view/CMS/JetWtagging#Recipes_to_apply_JEC_on_the_prun
 
+#include "CondFormats/JetMETObjects/interface/JetCorrectionUncertainty.h"
+
 #include "FWCore/Framework/interface/Frameworkfwd.h"
 #include "FWCore/Framework/interface/EDProducer.h"
 #include "FWCore/Framework/interface/ESHandle.h"
@@ -75,6 +77,8 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     if(isData_)
     jecAK8PayloadNames.push_back("L2L3Residual");
     vector<JetCorrectorParameters> vPar;
+    JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
     for ( vector<std::string>::const_iterator payloadBegin = jecAK8PayloadNames.begin(), 
                                               payloadEnd   = jecAK8PayloadNames.end()  , 
                                               ipayload     = payloadBegin; 
@@ -91,8 +95,16 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
         jecAK8->setJetEta( jet.correctedP4(0).eta()    );
         jecAK8->setJetE  ( jet.correctedP4(0).energy() );
         float corrMass   = jet.userFloat("ak8PFJetsCHSPrunedMass") * jecAK8->getCorrection();
+        float ptCor      = jet.pt();
+        jecUnc->setJetEta(jet.eta());
+        jecUnc->setJetPt(ptCor);
+        float unc = jecUnc->getUncertainty(true);
+        float ptCorUp   = ptCor*(1+unc);
+        float ptCorDown = ptCor*(1-unc);
         pat::Jet* cloneJet = jet.clone();
         cloneJet->addUserFloat("ak8PFJetsCHSCorrPrunedMass", corrMass );
+        cloneJet->addUserFloat("ptCorUp",   ptCorUp   );
+        cloneJet->addUserFloat("ptCorDown", ptCorDown );
         corrJets->push_back( *cloneJet );
     } 
     iEvent.put(corrJets, "corrJets");

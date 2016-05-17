@@ -119,6 +119,7 @@ private:
   int    numjets;
   double tau1,      tau2,     tau3,       tau21;
   double etjet1,    ptjet1,   etajet1,    phijet1;
+  double ptCorUp,   ptCorDown;
   double massjet1,  softjet1, prunedjet1;
   double rhojet1;                  // SRR : Jet Rho Ratio (m/pt*R)^2
   double nhfjet1,   chfjet1;       // neutral and charged hadron energy fraction
@@ -453,6 +454,10 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("miniIso1"         ,&miniIso1         ,"miniIso1/D"        );
   outTree_->Branch("miniIso2"         ,&miniIso2         ,"miniIso2/D"        );
   
+  // JEC Uncertainties
+  outTree_->Branch("ptCorUp"          ,&ptCorUp          ,"ptCorUp/D"         );
+  outTree_->Branch("ptCorDown"        ,&ptCorDown        ,"ptCorDown/D"       );
+
   // Jet ID quantities
   outTree_->Branch("nhfjet1"          ,&nhfjet1          ,"nhfjet1/D"         );
   outTree_->Branch("chfjet1"          ,&chfjet1          ,"chfjet1/D"         );
@@ -701,6 +706,8 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                    softjet1       = hadronicV.userFloat("ak8PFJetsCHSSoftDropMass");
                    prunedjet1     = hadronicV.userFloat("ak8PFJetsCHSPrunedMass");
                    massVhad       = hadronicV.userFloat("ak8PFJetsCHSCorrPrunedMass");
+                   ptCorUp        = hadronicV.userFloat("ptCorUp");
+                   ptCorDown      = hadronicV.userFloat("ptCorDown");
 		   // SRR : get rho ratio. This assumes the subjets are corrected to L2L3.
 		   // If not, they must be done on-the-fly with a separate jet corrector. 
 		   auto subjetsSD = hadronicV.subjets("SoftDrop");
@@ -1076,6 +1083,8 @@ void EDBRTreeMaker::setDummyValues() {
      candMass         = -1e4;
      ptVlep           = -1e4;
      ptVhad           = -1e4;
+     ptCorUp          = -1e4;
+     ptCorDown        = -1e4;
      yVlep            = -1e4;
      yVhad            = -1e4;
      phiVlep          = -1e4;
