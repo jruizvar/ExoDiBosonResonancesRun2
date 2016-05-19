@@ -14,9 +14,23 @@ patJetsReapplyJEC = updatedPatJets.clone(
                                     jetSource = cms.InputTag("slimmedJetsAK8"),
                                     jetCorrFactorsSource = cms.VInputTag(cms.InputTag("patJetCorrFactorsReapplyJEC") ))
 
+#### Smear newly corrected jets
+
+slimmedJetsSmeared = cms.EDProducer('SmearedPATJetProducer',
+        src = cms.InputTag('patJetsReapplyJEC'),
+        enabled = cms.bool(True),
+        rho = cms.InputTag("fixedGridRhoFastjetAll"),
+        resolutionFile = cms.FileInPath('ExoDiBosonResonances/EDBRJets/data/Fall15_25nsV2_MC_PtResolution_AK8PFchs.txt'),
+        scaleFactorFile = cms.FileInPath('ExoDiBosonResonances/EDBRJets/data/Fall15_25nsV2_MC_SF_AK8PFchs.txt'),
+        genJets = cms.InputTag('slimmedGenJetsAK8'),
+        dRMax = cms.double(0.2),
+        dPtMaxFactor = cms.double(3),
+        debug = cms.untracked.bool(False)
+        )
+
 goodJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
                          filterParams = pfJetIDSelector.clone(),
-                         src = cms.InputTag("patJetsReapplyJEC"),
+                         src = cms.InputTag("slimmedJetsSmeared"),
                          filter = cms.bool(True) )
 
 bestLeptonicVdaughters = cms.EDProducer("LeptonicVdaughters", src = cms.InputTag("bestLeptonicV"))
@@ -42,6 +56,7 @@ countCleanJets = cms.EDFilter("PATCandViewCountFilter",
 
 fatJetsSequence = cms.Sequence( patJetCorrFactorsReapplyJEC +
                                 patJetsReapplyJEC           +
+                                slimmedJetsSmeared          +
                                 goodJets                    +
                                 bestLeptonicVdaughters      + 
                                 cleanPatJets                + 
