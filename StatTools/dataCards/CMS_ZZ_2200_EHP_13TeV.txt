@@ -17,6 +17,8 @@ DY_pdf_norm                    lnU         1.             1.28         1.
 lumi_13TeV                     lnN         1.027          1.           1.
 CMS_eff_vtag_tau21_sf_13TeV    lnN         1.067/0.933    1.           1.067/0.933
 CMS_scale_j_13TeV              lnN         1.01           1.           1.
+CMS_hlt_E_13TeV                lnN         1.015          1.           1.
+CMS_idIso_E_13TeV              lnN         1.025          1.           1.
 CMS_scale_E_13TeV              lnN         1.005          1.           1.
 pdf_eig0                       param       0.             1.
 pdf_eig1                       param       0.             1.

@@ -1,7 +1,7 @@
 Combination of EHP=CMS_ZZ_1400_EHP_13TeV.txt  ELP=CMS_ZZ_1400_ELP_13TeV.txt  MHP=CMS_ZZ_1400_MHP_13TeV.txt  MLP=CMS_ZZ_1400_MLP_13TeV.txt
 imax 4 number of bins
 jmax 2 number of processes minus 1
-kmax 12 number of nuisance parameters
+kmax 16 number of nuisance parameters
 ----------------------------------------------------------------------------------------------------------------------------------
 shapes *         EHP       workSpaces/CMS_ZZ_1400_EHP_13TeV.root ZZ_13TeV:$PROCESS
 shapes data_obs  EHP       workSpaces/CMS_ZZ_1400_EHP_13TeV.root ZZ_13TeV:data_obs
@@ -21,8 +21,12 @@ process                                        0            1            2      
 rate                                           0.2999       1.0000       1.0000       0.2012       1.0000       1.0000       0.3502       1.0000       1.0000       0.2466       1.0000       1.0000     
 ----------------------------------------------------------------------------------------------------------------------------------
 CMS_eff_vtag_tau21_sf_13TeV   lnN              1.067/0.933  1.067/0.933  1.0          0.740/1.260  0.740/1.260  1.0          1.067/0.933  1.067/0.933  1.0          0.740/1.260  0.740/1.260  1.0        
+CMS_hlt_E_13TeV         lnN                    1.015        1.0          1.0          1.015        1.0          1.0          -            -            -            -            -            -          
+CMS_hlt_M_13TeV         lnN                    -            -            -            -            -            -            1.005        1.0          1.0          1.005        1.0          1.0        
+CMS_idIso_E_13TeV       lnN                    1.025        1.0          1.0          1.025        1.0          1.0          -            -            -            -            -            -          
+CMS_idIso_M_13TeV       lnN                    -            -            -            -            -            -            1.1          1.0          1.0          1.1          1.0          1.0        
 CMS_scale_E_13TeV       lnN                    1.005        1.0          1.0          1.005        1.0          1.0          -            -            -            -            -            -          
-CMS_scale_M_13TeV       lnN                    -            -            -            -            -            -            1.03         1.0          1.0          1.03         1.0          1.0        
+CMS_scale_M_13TeV       lnN                    -            -            -            -            -            -            1.005        1.0          1.0          1.005        1.0          1.0        
 CMS_scale_j_13TeV       lnN                    1.01         1.0          1.0          1.01         1.0          1.0          1.01         1.0          1.0          1.01         1.0          1.0        
 DY_pdf_norm             lnU                    1.0          1.0          1.28         1.0          1.0          1.34         1.0          1.0          1.42         1.0          1.0          1.32       
 lumi_13TeV              lnN                    1.027        1.0          1.0          1.027        1.0          1.0          1.027        1.0          1.0          1.027        1.0          1.0        
