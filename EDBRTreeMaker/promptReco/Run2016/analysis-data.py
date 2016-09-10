@@ -67,17 +67,14 @@ if TRIGGER == "mu" :
 process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
 process.source = cms.Source ("PoolSource",
     fileNames = cms.untracked.vstring(
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/420/00000/BC0967B1-F539-E611-8B56-02163E011FC2.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/588/00000/62262461-393A-E611-A7E8-02163E014341.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/601/00000/F867E6C2-743A-E611-B41D-02163E013668.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/603/00000/BAD21F5C-893A-E611-9979-02163E012B2D.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/656/00000/963FC359-493B-E611-8222-02163E011DD7.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/657/00000/2278F076-763B-E611-A2ED-02163E0143F2.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/657/00000/60DB896B-6F3B-E611-A541-02163E0138A6.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/658/00000/0A277CA9-BC3B-E611-B52F-02163E0118AD.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/658/00000/50E70893-9A3B-E611-A16C-02163E013466.root',
-       '/store/data/Run2016C/SinglePhoton/MINIAOD/PromptReco-v2/000/275/658/00000/60E5DF12-953B-E611-91FA-02163E01341F.root',
-    )
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/932/00000/084865EB-1859-E611-BDA7-02163E011A89.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/933/00000/847B2993-2059-E611-B05D-02163E0118F7.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/934/00000/12C329C6-1C59-E611-8391-02163E011D80.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/981/00000/160CD3EE-A259-E611-BEFC-FA163EC9796B.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/981/00000/92AC3676-8759-E611-A8C6-FA163E4C104F.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/991/00000/64F65ED3-BD59-E611-9522-02163E0141A1.root',
+       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/991/00000/6E453CB3-A259-E611-87E1-02163E0146A6.root',
+   )
 )
 
 #************************************* JSON file ***************************************************#

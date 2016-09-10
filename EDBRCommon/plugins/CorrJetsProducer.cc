@@ -95,6 +95,14 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
         jecAK8->setJetEta( jet.correctedP4(0).eta()    );
         jecAK8->setJetE  ( jet.correctedP4(0).energy() );
         float corrMass   = jet.userFloat("ak8PFJetsCHSPrunedMass") * jecAK8->getCorrection();
+        // Correct Puppi Softdrop jets
+        TLorentzVector puppi_softdrop, puppi_softdrop_subjet;
+        auto const & sdSubjetsPuppi = jet.subjets("SoftDropPuppi");
+        for ( auto const & it : sdSubjetsPuppi ) {
+          puppi_softdrop_subjet.SetPtEtaPhiM(it->pt(),it->eta(),it->phi(),it->mass());
+          puppi_softdrop+=puppi_softdrop_subjet;
+        }
+        float corrPuppiSoftDropMass = puppi_softdrop.M() * jecAK8->getCorrection();
         float ptCor      = jet.pt();
         jecUnc->setJetEta(jet.eta());
         jecUnc->setJetPt(ptCor);
@@ -103,6 +111,8 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
         float ptCorDown = ptCor*(1-unc);
         pat::Jet* cloneJet = jet.clone();
         cloneJet->addUserFloat("ak8PFJetsCHSCorrPrunedMass", corrMass );
+        cloneJet->addUserFloat("ak8PFJetsPuppiSoftDropMass", puppi_softdrop.M() );
+        cloneJet->addUserFloat("ak8PFJetsCorrPuppiSoftDropMass", corrPuppiSoftDropMass );
         cloneJet->addUserFloat("ptCorUp",   ptCorUp   );
         cloneJet->addUserFloat("ptCorDown", ptCorDown );
         corrJets->push_back( *cloneJet );

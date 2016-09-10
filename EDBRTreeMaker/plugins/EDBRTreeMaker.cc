@@ -117,10 +117,11 @@ private:
 
   //---------------------- JETS ------------------------------------------------------
   int    numjets;
-  double tau1,      tau2,     tau3,       tau21;
-  double etjet1,    ptjet1,   etajet1,    phijet1;
+  double tau1,      tau2,      tau3,      tau21;
+  double puppiTau1, puppiTau2, puppiTau3, puppiTau21;
+  double etjet1,    ptjet1,    etajet1,   phijet1;
   double ptCorUp,   ptCorDown;
-  double massjet1,  softjet1, prunedjet1;
+  double massjet1,  puppiSoftjet1, softjet1, prunedjet1;
   double rhojet1;                  // SRR : Jet Rho Ratio (m/pt*R)^2
   double nhfjet1,   chfjet1;       // neutral and charged hadron energy fraction
   double nemfjet1,  cemfjet1;      // neutral and charged EM fraction
@@ -325,7 +326,6 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("genphiG",&genphiG,"genphiG/D");
   outTree_->Branch("genmassG",&genmassG,"genmassG/D");
 
-
   // Basic event quantities
   outTree_->Branch("event"            ,&nevent           ,"event/I"           );
   outTree_->Branch("run"              ,&run              ,"run/I"             );
@@ -346,6 +346,10 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("tau2"             ,&tau2             ,"tau2/D"            );
   outTree_->Branch("tau3"             ,&tau3             ,"tau3/D"            );
   outTree_->Branch("tau21"            ,&tau21            ,"tau21/D"           );
+  outTree_->Branch("puppiTau1"        ,&puppiTau1        ,"puppiTau1/D"       );
+  outTree_->Branch("puppiTau2"        ,&puppiTau2        ,"puppiTau2/D"       );
+  outTree_->Branch("puppiTau3"        ,&puppiTau3        ,"puppiTau3/D"       );
+  outTree_->Branch("puppiTau21"       ,&puppiTau21       ,"puppiTau21/D"      );
   outTree_->Branch("lep"              ,&lep              ,"lep/I"             );
   outTree_->Branch("region"           ,&reg              ,"region/I"          );
   outTree_->Branch("channel"          ,&channel          ,"channel/I"         );
@@ -485,6 +489,7 @@ EDBRTreeMaker::EDBRTreeMaker(const edm::ParameterSet& iConfig):
   outTree_->Branch("pdgId2"           ,&pdgId2           ,"pdgId2/I"          );
   outTree_->Branch("phijet1"          ,&phijet1          ,"phijet1/D"         );
   outTree_->Branch("massjet1"         ,&massjet1         ,"massjet1/D"        );
+  outTree_->Branch("puppiSoftjet1"    ,&puppiSoftjet1    ,"puppiSoftjet1/D"   );
   outTree_->Branch("softjet1"         ,&softjet1         ,"softjet1/D"        );
   outTree_->Branch("prunedjet1"       ,&prunedjet1       ,"prunedjet1/D"      );
   outTree_->Branch("met"              ,&met              ,"met/D"             );
@@ -599,7 +604,11 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
        tau2           = hadronicV.userFloat("NjettinessAK8:tau2");
        tau3           = hadronicV.userFloat("NjettinessAK8:tau3");
        tau21          = tau2/tau1;
-       massVhad       = hadronicV.userFloat("ak8PFJetsCHSCorrPrunedMass");
+       puppiTau1      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1");
+       puppiTau2      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
+       puppiTau3      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
+       puppiTau21     = puppiTau2/puppiTau1;
+       massVhad       = hadronicV.userFloat("ak8PFJetsCorrPuppiSoftDropMass");
        passVhad = 1;      
      }
      Handle<reco::CandidateView> Zlept;
@@ -698,14 +707,19 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                    tau2           = hadronicV.userFloat("NjettinessAK8:tau2");
                    tau3           = hadronicV.userFloat("NjettinessAK8:tau3");
                    tau21          = tau2/tau1;
+                   puppiTau1      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1");
+                   puppiTau2      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
+                   puppiTau3      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
+                   puppiTau21     = puppiTau2/puppiTau1;
                    etjet1         = hadronicV.et();
                    ptjet1         = hadronicV.pt();
                    etajet1        = hadronicV.eta();
                    phijet1        = hadronicV.phi();
                    massjet1       = hadronicV.mass();
                    softjet1       = hadronicV.userFloat("ak8PFJetsCHSSoftDropMass");
+                   puppiSoftjet1  = hadronicV.userFloat("ak8PFJetsPuppiSoftDropMass");
                    prunedjet1     = hadronicV.userFloat("ak8PFJetsCHSPrunedMass");
-                   massVhad       = hadronicV.userFloat("ak8PFJetsCHSCorrPrunedMass");
+                   massVhad       = hadronicV.userFloat("ak8PFJetsCorrPuppiSoftDropMass");
                    ptCorUp        = hadronicV.userFloat("ptCorUp");
                    ptCorDown      = hadronicV.userFloat("ptCorDown");
 		   // SRR : get rho ratio. This assumes the subjets are corrected to L2L3.
@@ -1097,6 +1111,10 @@ void EDBRTreeMaker::setDummyValues() {
      tau2             = -1e4;
      tau3             = -1e4;
      tau21            = -1e4;
+     puppiTau1        = -1e4;
+     puppiTau2        = -1e4;
+     puppiTau3        = -1e4;
+     puppiTau21       = -1e4;
      ptlep1           = -1e4;
      ptlep2           = -1e4;
      etalep1          = -1e4;
@@ -1116,6 +1134,7 @@ void EDBRTreeMaker::setDummyValues() {
      etajet1          = -1e4;
      phijet1          = -1e4;
      massjet1         = -1e4;
+     puppiSoftjet1    = -1e4;
      softjet1         = -1e4;
      prunedjet1       = -1e4;
      rhojet1          = -1e4;
