@@ -1,7 +1,7 @@
 import FWCore.ParameterSet.Config as cms
 
-puppiTau21 = "userFloat('ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1')\
-             /userFloat('ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2')\
+puppiTau21 = "userFloat('ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2')\
+             /userFloat('ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau1')\
              <0.75" 
 
 corrJetsProducer = cms.EDProducer ( "CorrJetsProducer",
