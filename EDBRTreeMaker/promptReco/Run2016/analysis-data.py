@@ -79,11 +79,11 @@ process.source = cms.Source ("PoolSource",
 
 #************************************* JSON file ***************************************************#
 # https://cms-service-dqm.web.cern.ch/cms-service-dqm/CAF/certification/Collisions16/13TeV/
-# last modified 09-Sep-2016 
+# last modified 21-Oct-2016
 
 import FWCore.PythonUtilities.LumiList as LumiList
 process.source.lumisToProcess = LumiList.LumiList(
-    filename = '../Cert_271036-279931_13TeV_PromptReco_Collisions16_JSON_NoL1T.txt').getVLuminosityBlockRange()
+    filename = '../Cert_271036-280385_13TeV_PromptReco_Collisions16_JSON.txt').getVLuminosityBlockRange()
 
 #********************************  MODULES *********************************************************#
 
