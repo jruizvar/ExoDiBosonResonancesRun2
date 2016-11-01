@@ -19,8 +19,8 @@ nsubjettiness = cms.EDFilter(      "CandViewSelector",
 hadronicV = cms.EDFilter(          "CandViewSelector",
                                     src = cms.InputTag("nsubjettiness"),
                                     cut = cms.string('pt>200. & abs(eta)<2.4 & \
-                                                      userFloat("ak8PFJetsCorrPuppiSoftDropMass")>20. & \
-                                                      userFloat("ak8PFJetsCorrPuppiSoftDropMass")<220.'),
+                                                      userFloat("ak8PFJetsPuppiSoftDropMass")>20. & \
+                                                      userFloat("ak8PFJetsPuppiSoftDropMass")<220.'),
                                     filter = cms.bool(True) )
 
 hadronicVSequence = cms.Sequence(   corrJetsProducer +

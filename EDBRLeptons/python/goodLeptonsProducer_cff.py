@@ -33,7 +33,7 @@ goodLeptons = cms.EDProducer("GoodLeptonsProducer",
                                        elIsoMap   = cms.InputTag("electronsMiniIsolationValueMap:eArea"),
                                        muIsoMap   = cms.InputTag("muonsMiniIsolationValueMap:eArea"),
                                        heep       = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
-                                       loose      = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Spring15-25ns-V1-standalone-loose"))
+                                       loose      = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"))
 
 kinElectrons = cms.EDFilter("PATElectronSelector",
                                        src = cms.InputTag("goodLeptons:Electrons"),

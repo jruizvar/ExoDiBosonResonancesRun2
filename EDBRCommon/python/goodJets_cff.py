@@ -30,7 +30,8 @@ slimmedJetsSmeared = cms.EDProducer('SmearedPATJetProducer',
 
 goodJets = cms.EDFilter("PFJetIDSelectionFunctorFilter",
                          filterParams = pfJetIDSelector.clone(),
-                         src = cms.InputTag("slimmedJetsSmeared"),
+                         #src = cms.InputTag("slimmedJetsSmeared"),
+                         src = cms.InputTag("slimmedJetsAK8"),
                          filter = cms.bool(True) )
 
 bestLeptonicVdaughters = cms.EDProducer("LeptonicVdaughters", src = cms.InputTag("bestLeptonicV"))
@@ -54,9 +55,9 @@ countCleanJets = cms.EDFilter("PATCandViewCountFilter",
                                maxNumber = cms.uint32(999999),
                                src = cms.InputTag("cleanPatJets"))
 
-fatJetsSequence = cms.Sequence( patJetCorrFactorsReapplyJEC +
-                                patJetsReapplyJEC           +
-                                slimmedJetsSmeared          +
+fatJetsSequence = cms.Sequence( #patJetCorrFactorsReapplyJEC +
+                                #patJetsReapplyJEC           +
+                                #slimmedJetsSmeared          +
                                 goodJets                    +
                                 bestLeptonicVdaughters      + 
                                 cleanPatJets                + 

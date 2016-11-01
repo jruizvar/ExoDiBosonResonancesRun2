@@ -64,16 +64,19 @@ if TRIGGER == "mu" :
 
 #*********************************** POOL SOURCE ****************************************************#
 
-process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(-1) )
+process.maxEvents = cms.untracked.PSet( input = cms.untracked.int32(300000) )
 process.source = cms.Source ("PoolSource",
     fileNames = cms.untracked.vstring(
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/932/00000/084865EB-1859-E611-BDA7-02163E011A89.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/933/00000/847B2993-2059-E611-B05D-02163E0118F7.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/934/00000/12C329C6-1C59-E611-8391-02163E011D80.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/981/00000/160CD3EE-A259-E611-BEFC-FA163EC9796B.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/981/00000/92AC3676-8759-E611-A8C6-FA163E4C104F.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/991/00000/64F65ED3-BD59-E611-9522-02163E0141A1.root',
-       '/store/data/Run2016F/SingleMuon/MINIAOD/PromptReco-v1/000/277/991/00000/6E453CB3-A259-E611-87E1-02163E0146A6.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/024FCF72-4E90-E611-B1D3-0CC47A4DEDA0.root', 
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/02D289B4-E790-E611-BF32-20CF3027A613.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/02D67FBF-1392-E611-905D-001E67F33631.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/02E99EA6-FC8F-E611-BB61-848F69FD2910.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/02E9B048-B190-E611-B70C-0090FAA1AD04.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/04979DDF-A991-E611-9F3E-001E67E713FE.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/06C37CFA-4B90-E611-B505-901B0E542804.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/089B88C4-A590-E611-8222-0CC47A1DF806.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/08AF5C24-A490-E611-A105-0090FAA583C4.root',
+       '/store/data/Run2016F/SingleElectron/MINIAOD/23Sep2016-v1/50000/08DD8A20-7990-E611-9558-848F69FD2520.root',
    )
 )
 
@@ -100,7 +103,8 @@ process.bestHadronicV = cms.EDFilter(    "LargestPtCandSelector",
 process.graviton = cms.EDProducer(        "CandViewCombiner",
                                           decay           = cms.string  ( "bestLeptonicV bestHadronicV" ),
                                           checkCharge     = cms.bool    (  False                        ),
-                                          cut             = cms.string  ( "mass>600."                   ),
+                                          #cut             = cms.string  ( "mass>600."                   ),
+                                          cut             = cms.string  ( ""                            ),
                                           roles           = cms.vstring ( 'leptonicV', 'hadronicV'      ))
 
 process.gravitonFilter =  cms.EDFilter(   "CandViewCountFilter",
@@ -131,8 +135,6 @@ for idmod in my_id_modules:
 
 #Change vertex collection in Dxy cut
 process.egmGsfElectronIDs.physicsObjectIDs[0].idDefinition.cutFlow[9].vertexSrcMiniAOD = "goodOfflinePrimaryVertex"
-process.egmGsfElectronIDs.physicsObjectIDs[1].idDefinition.cutFlow[6].vertexSrcMiniAOD = "goodOfflinePrimaryVertex"
-process.egmGsfElectronIDs.physicsObjectIDs[1].idDefinition.cutFlow[7].vertexSrcMiniAOD = "goodOfflinePrimaryVertex"
 
 process.leptonSequence = cms.Sequence(    process.hltSequence              +
                                           process.goodLeptonsProducer      +  

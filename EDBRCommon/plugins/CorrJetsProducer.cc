@@ -60,41 +60,41 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
     iEvent.getByToken(jetToken_, jets);
     size_t mult = jets->size();
 
-    Handle<reco::VertexCollection>  vertices;
-    iEvent.getByToken(vertexToken_, vertices);
-    size_t nVtx = vertices->size();
-
-    Handle< double >        rhoHandle;
-    iEvent.getByToken(rho_, rhoHandle);
-    double rho =           *rhoHandle;
-
-    // Jet Energy Corrections
-    ESHandle<JetCorrectorParametersCollection>       JetCorParColl;
-    iSetup.get<JetCorrectionsRecord>().get(payload_, JetCorParColl); 
-    vector<string> jecAK8PayloadNames;
-    jecAK8PayloadNames.push_back("L2Relative");
-    jecAK8PayloadNames.push_back("L3Absolute");
-    if(isData_)
-    jecAK8PayloadNames.push_back("L2L3Residual");
-    vector<JetCorrectorParameters> vPar;
-    JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
-    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
-    for ( vector<std::string>::const_iterator payloadBegin = jecAK8PayloadNames.begin(), 
-                                              payloadEnd   = jecAK8PayloadNames.end()  , 
-                                              ipayload     = payloadBegin; 
-                                              ipayload    != payloadEnd; 
-                                            ++ipayload )  vPar.push_back( (*JetCorParColl)[*ipayload] );
-    // Make the FactorizedJetCorrector
-    shared_ptr<FactorizedJetCorrector> jecAK8 = shared_ptr<FactorizedJetCorrector> ( new FactorizedJetCorrector(vPar) ); 
-    jecAK8->setRho( rho  );
-    jecAK8->setNPV( nVtx );
+//    Handle<reco::VertexCollection>  vertices;
+//    iEvent.getByToken(vertexToken_, vertices);
+//    size_t nVtx = vertices->size();
+//
+//    Handle< double >        rhoHandle;
+//    iEvent.getByToken(rho_, rhoHandle);
+//    double rho =           *rhoHandle;
+//
+//    // Jet Energy Corrections
+//    ESHandle<JetCorrectorParametersCollection>       JetCorParColl;
+//    iSetup.get<JetCorrectionsRecord>().get(payload_, JetCorParColl); 
+//    vector<string> jecAK8PayloadNames;
+//    jecAK8PayloadNames.push_back("L2Relative");
+//    jecAK8PayloadNames.push_back("L3Absolute");
+//    if(isData_)
+//    jecAK8PayloadNames.push_back("L2L3Residual");
+//    vector<JetCorrectorParameters> vPar;
+//    JetCorrectorParameters const & JetCorPar = (*JetCorParColl)["Uncertainty"];
+//    JetCorrectionUncertainty *jecUnc = new JetCorrectionUncertainty(JetCorPar);
+//    for ( vector<std::string>::const_iterator payloadBegin = jecAK8PayloadNames.begin(), 
+//                                              payloadEnd   = jecAK8PayloadNames.end()  , 
+//                                              ipayload     = payloadBegin; 
+//                                              ipayload    != payloadEnd; 
+//                                            ++ipayload )  vPar.push_back( (*JetCorParColl)[*ipayload] );
+//    // Make the FactorizedJetCorrector
+//    shared_ptr<FactorizedJetCorrector> jecAK8 = shared_ptr<FactorizedJetCorrector> ( new FactorizedJetCorrector(vPar) ); 
+//    jecAK8->setRho( rho  );
+//    jecAK8->setNPV( nVtx );
     for ( size_t i=0; i<mult; ++i ) {
         const pat::Jet& jet = (*jets)[i];
-        jecAK8->setJetA  ( jet.jetArea()               );
-        jecAK8->setJetPt ( jet.correctedP4(0).pt()     );
-        jecAK8->setJetEta( jet.correctedP4(0).eta()    );
-        jecAK8->setJetE  ( jet.correctedP4(0).energy() );
-        float corrMass   = jet.userFloat("ak8PFJetsCHSPrunedMass") * jecAK8->getCorrection();
+//        jecAK8->setJetA  ( jet.jetArea()               );
+//        jecAK8->setJetPt ( jet.correctedP4(0).pt()     );
+//        jecAK8->setJetEta( jet.correctedP4(0).eta()    );
+//        jecAK8->setJetE  ( jet.correctedP4(0).energy() );
+//        float corrMass   = jet.userFloat("ak8PFJetsCHSPrunedMass") * jecAK8->getCorrection();
         // Correct Puppi Softdrop jets
         TLorentzVector puppi_softdrop, puppi_softdrop_subjet;
         auto const & sdSubjetsPuppi = jet.subjets("SoftDropPuppi");
@@ -102,19 +102,19 @@ void CorrJetsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup
           puppi_softdrop_subjet.SetPtEtaPhiM(it->pt(),it->eta(),it->phi(),it->mass());
           puppi_softdrop+=puppi_softdrop_subjet;
         }
-        float corrPuppiSoftDropMass = puppi_softdrop.M() * jecAK8->getCorrection();
-        float ptCor      = jet.pt();
-        jecUnc->setJetEta(jet.eta());
-        jecUnc->setJetPt(ptCor);
-        float unc = jecUnc->getUncertainty(true);
-        float ptCorUp   = ptCor*(1+unc);
-        float ptCorDown = ptCor*(1-unc);
+//        float corrPuppiSoftDropMass = puppi_softdrop.M() * jecAK8->getCorrection();
+//        float ptCor      = jet.pt();
+//        jecUnc->setJetEta(jet.eta());
+//        jecUnc->setJetPt(ptCor);
+//        float unc = jecUnc->getUncertainty(true);
+//        float ptCorUp   = ptCor*(1+unc);
+//        float ptCorDown = ptCor*(1-unc);
         pat::Jet* cloneJet = jet.clone();
-        cloneJet->addUserFloat("ak8PFJetsCHSCorrPrunedMass", corrMass );
+//        cloneJet->addUserFloat("ak8PFJetsCHSCorrPrunedMass", corrMass );
         cloneJet->addUserFloat("ak8PFJetsPuppiSoftDropMass", puppi_softdrop.M() );
-        cloneJet->addUserFloat("ak8PFJetsCorrPuppiSoftDropMass", corrPuppiSoftDropMass );
-        cloneJet->addUserFloat("ptCorUp",   ptCorUp   );
-        cloneJet->addUserFloat("ptCorDown", ptCorDown );
+//        cloneJet->addUserFloat("ak8PFJetsCorrPuppiSoftDropMass", corrPuppiSoftDropMass );
+//        cloneJet->addUserFloat("ptCorUp",   ptCorUp   );
+//        cloneJet->addUserFloat("ptCorDown", ptCorDown );
         corrJets->push_back( *cloneJet );
     } 
     iEvent.put(corrJets, "corrJets");

@@ -608,7 +608,7 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
        puppiTau2      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau2");
        puppiTau3      = hadronicV.userFloat("ak8PFJetsPuppiValueMap:NjettinessAK8PuppiTau3");
        puppiTau21     = puppiTau2/puppiTau1;
-       massVhad       = hadronicV.userFloat("ak8PFJetsCorrPuppiSoftDropMass");
+       massVhad       = hadronicV.userFloat("ak8PFJetsPuppiSoftDropMass");
        passVhad = 1;      
      }
      Handle<reco::CandidateView> Zlept;
@@ -719,9 +719,9 @@ void EDBRTreeMaker::analyze(const edm::Event& iEvent, const edm::EventSetup& iSe
                    softjet1       = hadronicV.userFloat("ak8PFJetsCHSSoftDropMass");
                    puppiSoftjet1  = hadronicV.userFloat("ak8PFJetsPuppiSoftDropMass");
                    prunedjet1     = hadronicV.userFloat("ak8PFJetsCHSPrunedMass");
-                   massVhad       = hadronicV.userFloat("ak8PFJetsCorrPuppiSoftDropMass");
-                   ptCorUp        = hadronicV.userFloat("ptCorUp");
-                   ptCorDown      = hadronicV.userFloat("ptCorDown");
+                   massVhad       = hadronicV.userFloat("ak8PFJetsPuppiSoftDropMass");
+                   //ptCorUp        = hadronicV.userFloat("ptCorUp");
+                   //ptCorDown      = hadronicV.userFloat("ptCorDown");
 		   // SRR : get rho ratio. This assumes the subjets are corrected to L2L3.
 		   // If not, they must be done on-the-fly with a separate jet corrector. 
 		   auto subjetsSD = hadronicV.subjets("SoftDrop");
