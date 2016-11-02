@@ -43,8 +43,8 @@ class GoodLeptonsProducer : public edm::EDProducer {
       edm::EDGetTokenT<reco::VertexCollection>               vertexToken;
       edm::EDGetTokenT<pat::ElectronCollection>            electronToken;
       edm::EDGetTokenT<pat::MuonCollection>                    muonToken;
-      edm::EDGetTokenT<edm::ValueMap<float> >              elIsoMapToken;
-      edm::EDGetTokenT<edm::ValueMap<float> >              muIsoMapToken;
+      //edm::EDGetTokenT<edm::ValueMap<float> >              elIsoMapToken;
+      //edm::EDGetTokenT<edm::ValueMap<float> >              muIsoMapToken;
       edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> >     heepToken;
       edm::EDGetTokenT<edm::ValueMap<vid::CutFlowResult> >    looseToken;
 };
@@ -53,8 +53,8 @@ GoodLeptonsProducer::GoodLeptonsProducer(const edm::ParameterSet& iConfig):
     vertexToken(   consumes<reco::VertexCollection> (            iConfig.getParameter<edm::InputTag>("vertex"    ) ) ),
     electronToken( consumes<pat::ElectronCollection>(            iConfig.getParameter<edm::InputTag>("electrons" ) ) ),
     muonToken(     consumes<pat::MuonCollection>(                iConfig.getParameter<edm::InputTag>("muons"     ) ) ),
-    elIsoMapToken( consumes<edm::ValueMap<float> >(              iConfig.getParameter<edm::InputTag>("elIsoMap"  ) ) ),
-    muIsoMapToken( consumes<edm::ValueMap<float> >(              iConfig.getParameter<edm::InputTag>("muIsoMap"  ) ) ),
+    //elIsoMapToken( consumes<edm::ValueMap<float> >(              iConfig.getParameter<edm::InputTag>("elIsoMap"  ) ) ),
+    //muIsoMapToken( consumes<edm::ValueMap<float> >(              iConfig.getParameter<edm::InputTag>("muIsoMap"  ) ) ),
     heepToken(  consumes<edm::ValueMap<vid::CutFlowResult> >(    iConfig.getParameter<edm::InputTag>("heep"      ) ) ),
     looseToken(    consumes<edm::ValueMap<vid::CutFlowResult> >( iConfig.getParameter<edm::InputTag>("loose"     ) ) )
 {
@@ -85,9 +85,9 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
     size_t muMult=muons->size();
 
     // miniIsolation valueMaps
-    Handle<ValueMap<float> > elIsoMap, muIsoMap ;
-    iEvent.getByToken(elIsoMapToken,   elIsoMap);
-    iEvent.getByToken(muIsoMapToken,   muIsoMap);
+    //Handle<ValueMap<float> > elIsoMap, muIsoMap ;
+    //iEvent.getByToken(elIsoMapToken,   elIsoMap);
+    //iEvent.getByToken(muIsoMapToken,   muIsoMap);
 
     // electron IDs
     Handle<ValueMap<vid::CutFlowResult> > looseHandle, heepHandle;
@@ -112,7 +112,8 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         bool  heep              =  (*heepHandle)[elPtr].getCutFlowResultMasking(maskCuts).cutFlowPassed();
         bool  loose             = (*looseHandle)[elPtr].getCutFlowResultMasking(maskPFIso).cutFlowPassed();
         float pfIso03R          = (*looseHandle)[elPtr].getValueCutUpon(maskPFIso[0]);
-        float miniIso           =    (*elIsoMap)[elPtr]; 
+        //float miniIso           =    (*elIsoMap)[elPtr]; 
+        float miniIso           =  -9999.; 
         pat::Electron* cloneEl = el.clone();
         cloneEl->addUserInt("slimmedIndex",  i          ); // index to localize the goodElectron in the slimmedElectrons
         cloneEl->addUserInt("HEEP",          HEEP       );
@@ -124,7 +125,7 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         goodElectrons->push_back(            *cloneEl   );
     }
     for ( size_t i=0; i<muMult; ++i ) {
-        const Ptr<pat::Muon> muPtr(muons, i);
+        //const Ptr<pat::Muon> muPtr(muons, i);
         const pat::Muon& mu    = (*muons)[i];
         reco::MuonPFIsolation iso03R = mu.pfIsolationR03();
         reco::MuonPFIsolation iso04R = mu.pfIsolationR04();
@@ -134,7 +135,8 @@ GoodLeptonsProducer::produce(edm::Event& iEvent, const edm::EventSetup& iSetup)
         double absIso04R   = iso04R.sumChargedHadronPt + std::max(0.0,iso04R.sumNeutralHadronEt+iso04R.sumPhotonEt-0.5*iso04R.sumPUPt);
         double pfIso03R    = absIso03R/mu.pt();
         double pfIso04R    = absIso04R/mu.pt();
-        float miniIso      = (*muIsoMap)[muPtr]; 
+        //float miniIso      = (*muIsoMap)[muPtr]; 
+        float miniIso      = -9999.; 
         float trackIso     = mu.isolationR03().sumPt;
         float innerPt      = mu.innerTrack().isNonnull() ? mu.innerTrack()->pt() : -1.e4;
         bool  trackerMu    = hptm::isTrackerMuon(mu, vertex);  

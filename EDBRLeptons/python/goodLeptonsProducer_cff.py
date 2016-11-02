@@ -30,8 +30,8 @@ goodLeptons = cms.EDProducer("GoodLeptonsProducer",
                                        vertex     = cms.InputTag("goodOfflinePrimaryVertex"),
                                        electrons  = cms.InputTag("slimmedElectrons"),
                                        muons      = cms.InputTag("slimmedMuons"),
-                                       elIsoMap   = cms.InputTag("electronsMiniIsolationValueMap:eArea"),
-                                       muIsoMap   = cms.InputTag("muonsMiniIsolationValueMap:eArea"),
+                                       #elIsoMap   = cms.InputTag("electronsMiniIsolationValueMap:eArea"),
+                                       #muIsoMap   = cms.InputTag("muonsMiniIsolationValueMap:eArea"),
                                        heep       = cms.InputTag("egmGsfElectronIDs:heepElectronID-HEEPV60"),
                                        loose      = cms.InputTag("egmGsfElectronIDs:cutBasedElectronID-Summer16-80X-V1-loose"))
 
@@ -54,8 +54,8 @@ idMuons = cms.EDFilter("PATMuonSelector",
                                        cut = cms.string("userInt('isTracker') == 1 || userInt('isHighPt') == 1"))
 
 goodLeptonsProducer = cms.Sequence(    goodOfflinePrimaryVertex       +
-                                       electronsMiniIsolationValueMap +
-                                       muonsMiniIsolationValueMap     +
+                                       #electronsMiniIsolationValueMap +
+                                       #muonsMiniIsolationValueMap     +
                                        goodLeptons                    +
                                        kinElectrons                   +
                                        idElectrons                    +
