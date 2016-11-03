@@ -11,14 +11,14 @@ hltMatchingElectrons = cms.EDProducer("PatElectronHLTmatching",
                                   hltToken   = cms.InputTag("TriggerResults","","HLT"          ),
                                   hltObjects = cms.InputTag("selectedPatTrigger"               ),
                                   leptons    = cms.InputTag("slimmedElectrons"                 ),
-                                  maxDeltaR  = cms.double  ( 0.3                               ))
+                                  maxDeltaR  = cms.double  ( 0.15                              ))
 
 hltMatchingMuons = cms.EDProducer("PatMuonHLTmatching",
                                   path       = cms.vstring ("HLT_Mu45_eta2p1_v*"               ),
                                   hltToken   = cms.InputTag("TriggerResults","","HLT"          ),
                                   hltObjects = cms.InputTag("selectedPatTrigger"               ),
                                   leptons    = cms.InputTag("slimmedMuons"                     ),
-                                  maxDeltaR  = cms.double  ( 0.3                               ))
+                                  maxDeltaR  = cms.double  ( 0.15                              ))
 
 hltSequence = cms.Sequence(       hltFilter            + 
                                   hltMatchingElectrons +
